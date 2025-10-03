@@ -1,0 +1,272 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  identifier  String   @unique
+  password    String
+  role        UserRole @default(USER)
+  name        String?
+  email       String?  @unique
+  creci       String?  @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  managedLots Lot[]
+
+  @@map("users")
+}
+
+model Client {
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  phone        String?
+  document     String
+  address      String?
+  city         String?
+  state        String?
+  country      String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  portfolios   Portfolio[]
+  transactions Transaction[]
+
+  @@map("clients")
+}
+
+model Asset {
+  id             String          @id @default(cuid())
+  symbol         String          @unique
+  name           String
+  type           AssetType
+  category       String?
+  price          Float
+  currency       String          @default("BRL")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  lots           Lot[]
+  portfolioItems PortfolioItem[]
+  transactions   Transaction[]
+
+  @@map("assets")
+}
+
+model Lot {
+  id             String        @id @default(cuid())
+  assetId        String?
+  empreendimentoId String?
+  quadraId       String?
+  empreendimento String?
+  quadra         String?
+  lote           String
+  area           Float
+  valor          Float
+  entrada        Float
+  status         String        @default("DISPONÍVEL")
+  observacoes    String?
+  reservedAt     DateTime?
+  reservedBy     String?
+  managedBy      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  porcentagem    Float?
+  valorPorMetro  Float?
+  manager        User?         @relation(fields: [managedBy], references: [id])
+  asset          Asset?        @relation(fields: [assetId], references: [id])
+  empreendimentoRel Empreendimento? @relation(fields: [empreendimentoId], references: [id])
+  quadraRel      Quadra?       @relation(fields: [quadraId], references: [id])
+  transactions   Transaction[]
+
+  @@map("lots")
+}
+
+model Transaction {
+  id         String            @id @default(cuid())
+  clientId   String
+  assetId    String?
+  lotId      String?
+  type       TransactionType
+  quantity   Int
+  price      Float
+  totalValue Float
+  commission Float             @default(0)
+  taxes      Float             @default(0)
+  date       DateTime
+  status     TransactionStatus @default(COMPLETED)
+  notes      String?
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  lot        Lot?              @relation(fields: [lotId], references: [id])
+  asset      Asset?            @relation(fields: [assetId], references: [id])
+  client     Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model Portfolio {
+  id          String          @id @default(cuid())
+  clientId    String
+  name        String
+  description String?
+  totalValue  Float           @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  items       PortfolioItem[]
+  client      Client          @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("portfolios")
+}
+
+model PortfolioItem {
+  id           String    @id @default(cuid())
+  portfolioId  String
+  assetId      String
+  quantity     Int
+  averagePrice Float
+  currentValue Float
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  asset        Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  portfolio    Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, assetId])
+  @@map("portfolio_items")
+}
+
+model SystemSettings {
+  id                   String   @id @default(cuid())
+  nomeSistema          String   @default("Sistema de Gestão de Lotes")
+  logoUrl              String?
+  corPrimaria          String   @default("#3b82f6")
+  corSecundaria        String   @default("#64748b")
+  moeda                String   @default("BRL")
+  formatoData          String   @default("DD/MM/YYYY")
+  idioma               String   @default("pt-BR")
+  porcentagemPadrao    Float    @default(10)
+  permitirEdicao       Boolean  @default(true)
+  exigirAutenticacao   Boolean  @default(true)
+  reservationDays     Int      @default(3)
+  externalReserveLink  String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+model Empreendimento {
+  id          String   @id @default(cuid())
+  nome        String
+  descricao   String?
+  endereco    String?
+  cidade      String?
+  estado      String?
+  pais        String?
+  areaTotal   Float?
+  areaUtil    Float?
+  quantidadeLotes Int?
+  valorTotal   Float?
+  status      String   @default("ATIVO")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+  lots        Lot[]
+  quadras     Quadra[]
+
+  @@map("empreendimentos")
+}
+
+model Quadra {
+  id               String           @id @default(cuid())
+  nome             String
+  empreendimentoId String
+  areaTotal        Float?
+  quantidadeLotes  Int?
+  valorMetroQuadrado Float?
+  status           String           @default("ATIVO")
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  deletedAt        DateTime?
+  deletedBy        String?
+  empreendimento  Empreendimento   @relation(fields: [empreendimentoId], references: [id], onDelete: Cascade)
+  lots             Lot[]
+
+  @@unique([nome, empreendimentoId])
+  @@map("quadras")
+}
+
+model PaymentCondition {
+  id           String   @id @default(cuid())
+  nome         String
+  porcentagens String   // JSON array de porcentagens
+  status       String   @default("ATIVO")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime?
+  deletedBy    String?
+
+  @@map("payment_conditions")
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  title       String
+  message     String
+  type        NotificationType @default(INFO)
+  read        Boolean          @default(false)
+  userId      String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  deletedAt   DateTime?
+  deletedBy   String?
+
+  @@map("notifications")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum NotificationType {
+  INFO
+  SUCCESS
+  WARNING
+  ERROR
+}
+
+enum AssetType {
+  STOCK
+  BOND
+  ETF
+  REIT
+  CRYPTO
+  CURRENCY
+  COMMODITY
+  DERIVATIVE
+  REAL_ESTATE
+  OTHER
+}
+
+enum TransactionType {
+  BUY
+  SELL
+  TRANSFER_IN
+  TRANSFER_OUT
+  RESERVE
+  CANCEL_RESERVE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  FAILED
+}

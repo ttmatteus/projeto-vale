@@ -1,0 +1,27 @@
+> Ready on http://0.0.0.0:3000
+> Socket.IO server running at ws://0.0.0.0:3000/api/socketio
+ ○ Compiling / ...
+ ✓ Compiled / in 9.7s (2189 modules)
+ GET / 200 in 10981ms
+ ○ Compiling /api/auth/validate ...
+ ✓ Compiled /api/auth/validate in 823ms (2178 modules)
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`identifier`, `main`.`users`.`role`, `main`.`users`.`name`, `main`.`users`.`email`, `main`.`users`.`creci`, `main`.`users`.`isActive` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/validate 200 in 1010ms
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`identifier`, `main`.`users`.`role`, `main`.`users`.`name`, `main`.`users`.`email`, `main`.`users`.`creci`, `main`.`users`.`isActive` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/validate 200 in 13ms
+ ✓ Compiled /api/empreendimentos in 374ms (2180 modules)
+prisma:query SELECT `main`.`empreendimentos`.`id`, `main`.`empreendimentos`.`nome`, `main`.`empreendimentos`.`descricao`, `main`.`empreendimentos`.`endereco`, `main`.`empreendimentos`.`cidade`, `main`.`empreendimentos`.`estado`, `main`.`empreendimentos`.`pais`, `main`.`empreendimentos`.`areaTotal`, `main`.`empreendimentos`.`areaUtil`, `main`.`empreendimentos`.`quantidadeLotes`, `main`.`empreendimentos`.`valorTotal`, `main`.`empreendimentos`.`status`, `main`.`empreendimentos`.`createdAt`, `main`.`empreendimentos`.`updatedAt`, `main`.`empreendimentos`.`deletedAt`, `main`.`empreendimentos`.`deletedBy` FROM `main`.`empreendimentos` WHERE `main`.`empreendimentos`.`deletedAt` IS NULL ORDER BY `main`.`empreendimentos`.`createdAt` DESC LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`quadras`.`id`, `main`.`quadras`.`nome`, `main`.`quadras`.`empreendimentoId`, `main`.`quadras`.`areaTotal`, `main`.`quadras`.`quantidadeLotes`, `main`.`quadras`.`valorMetroQuadrado`, `main`.`quadras`.`status`, `main`.`quadras`.`createdAt`, `main`.`quadras`.`updatedAt`, `main`.`quadras`.`deletedAt`, `main`.`quadras`.`deletedBy` FROM `main`.`quadras` WHERE (`main`.`quadras`.`deletedAt` IS NULL AND `main`.`quadras`.`empreendimentoId` IN (?,?)) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`lots`.`id`, `main`.`lots`.`assetId`, `main`.`lots`.`empreendimentoId`, `main`.`lots`.`quadraId`, `main`.`lots`.`empreendimento`, `main`.`lots`.`quadra`, `main`.`lots`.`lote`, `main`.`lots`.`area`, `main`.`lots`.`valor`, `main`.`lots`.`entrada`, `main`.`lots`.`status`, `main`.`lots`.`observacoes`, `main`.`lots`.`reservedAt`, `main`.`lots`.`reservedBy`, `main`.`lots`.`managedBy`, `main`.`lots`.`createdAt`, `main`.`lots`.`updatedAt`, `main`.`lots`.`porcentagem`, `main`.`lots`.`valorPorMetro` FROM `main`.`lots` WHERE `main`.`lots`.`empreendimentoId` IN (?,?) LIMIT ? OFFSET ?
+ GET /api/empreendimentos 200 in 422ms
+prisma:query SELECT `main`.`users`.`id`, `main`.`users`.`identifier`, `main`.`users`.`role`, `main`.`users`.`name`, `main`.`users`.`email`, `main`.`users`.`creci`, `main`.`users`.`isActive` FROM `main`.`users` WHERE (`main`.`users`.`id` = ? AND 1=1) LIMIT ? OFFSET ?
+ GET /api/auth/validate 200 in 21ms
+ ✓ Compiled /api/notifications in 303ms (2182 modules)
+prisma:query SELECT `main`.`notifications`.`id`, `main`.`notifications`.`title`, `main`.`notifications`.`message`, `main`.`notifications`.`type`, `main`.`notifications`.`read`, `main`.`notifications`.`userId`, `main`.`notifications`.`createdAt`, `main`.`notifications`.`updatedAt`, `main`.`notifications`.`deletedAt`, `main`.`notifications`.`deletedBy` FROM `main`.`notifications` WHERE `main`.`notifications`.`deletedAt` IS NULL ORDER BY `main`.`notifications`.`createdAt` DESC LIMIT ? OFFSET ?
+ GET /api/notifications?limit=10 200 in 337ms
+ ✓ Compiled /api/lots in 293ms (2184 modules)
+ GET /api/lots 200 in 332ms
+ ✓ Compiled /api/reports/reservations-by-month in 291ms (2186 modules)
+prisma:query SELECT `main`.`transactions`.`id`, `main`.`transactions`.`date` FROM `main`.`transactions` WHERE (`main`.`transactions`.`type` = ? AND `main`.`transactions`.`date` >= ? AND `main`.`transactions`.`date` <= ? AND `main`.`transactions`.`status` = ?) LIMIT ? OFFSET ?
+prisma:query SELECT `main`.`lots`.`id`, `main`.`lots`.`reservedAt` FROM `main`.`lots` WHERE (`main`.`lots`.`status` = ? AND `main`.`lots`.`reservedAt` >= ? AND `main`.`lots`.`reservedAt` <= ?) LIMIT ? OFFSET ?
+ GET /api/reports/reservations-by-month 200 in 325ms
