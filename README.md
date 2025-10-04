@@ -10,7 +10,7 @@
 1. **Clone o repositório:**
 
 ```bash
-git clone <seu-repositorio>
+git clone https://github.com/ttmatteus/projeto-vale.git
 cd projeto-vale
 ```
 
