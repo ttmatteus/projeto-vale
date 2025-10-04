@@ -113,9 +113,12 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Correspondere a todos os caminhos de requisição
-  
+     * Correspondere a todos os caminhos de requisição exceto:
+     * - _next/static (arquivos estáticos do Next.js)
+     * - _next/image (otimização de imagens do Next.js)
+     * - favicon.ico (ícone do site)
+     * - arquivos estáticos da pasta public (imagens, etc.)
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.png|.*\\.jpg|.*\\.jpeg|.*\\.gif|.*\\.svg|.*\\.ico|.*\\.webp).*)',
   ],
 };

@@ -50,7 +50,7 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
 
   // Determinar rota de redirecionamento
   const getRedirectPath = useCallback(() => {
-    if (!sanitizedUser) return "/";
+    if (!sanitizedUser) return null; // Não redirecionar se não estiver autenticado
     
     if (pathname === "/") {
       return sanitizedUser.role === "admin" ? "/dash-admin" : "/my-lots";
@@ -71,7 +71,7 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsInitialized(true);
-    }, 50); // Reduzido para melhor performance
+    }, 100); // Aumentado para evitar race conditions
 
     return () => clearTimeout(timer);
   }, []);
@@ -86,14 +86,15 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
 
   // Lógica de redirecionamento centralizada e otimizada
   useEffect(() => {
-    if (authState === "loading" || !isInitialized) return;
+    if (authState === "loading" || !isInitialized || isLoading) return;
 
     const redirectPath = getRedirectPath();
-    if (redirectPath) {
+    if (redirectPath && redirectPath !== pathname) {
+      console.log('AuthGuard: Redirecting to', redirectPath);
       router.push(redirectPath);
       return;
     }
-  }, [authState, isInitialized, getRedirectPath, router]);
+  }, [authState, isInitialized, isLoading, getRedirectPath, router, pathname]);
 
   // Estados de loading otimizados
   if (isLoading || !isInitialized || authState === "loading") {
@@ -111,7 +112,8 @@ export function AuthGuard({ children, requireAdmin = false }: AuthGuardProps) {
 
   // Renderização condicional otimizada
   if (authState === "unauthenticated") {
-    return PUBLIC_ROUTES.has(pathname) ? <>{children}</> : null;
+    // Se não está autenticado, mostrar a página de login
+    return <>{children}</>;
   }
 
   // Verificação de acesso antes de renderizar conteúdo sensível

@@ -20,6 +20,8 @@ export function useAuth() {
   const router = useRouter();
 
   useEffect(() => {
+    let isMounted = true;
+    
     const checkAuth = async () => {
       try {
         // Primeiro, verificar se tem um token JWT no sessionStorage
@@ -33,6 +35,8 @@ export function useAuth() {
           method: 'GET',
           // Cookies são incluídos automaticamente pelo navegador
         });
+
+        if (!isMounted) return; // Evitar atualizações se o componente foi desmontado
 
         if (response.ok) {
           const userData = await response.json();
@@ -51,17 +55,24 @@ export function useAuth() {
           sessionStorage.removeItem('jwtToken');
         }
       } catch (error) {
+        if (!isMounted) return;
         console.error('Falha na validação de autenticação:', error);
         setUser(null);
         setIsAuthenticated(false);
         setJwtToken(null);
         sessionStorage.removeItem('jwtToken');
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     checkAuth();
+    
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const login = async (credentials: { identifier: string; password: string }) => {
@@ -111,7 +122,7 @@ export function useAuth() {
       setIsAuthenticated(false);
       setJwtToken(null);
       sessionStorage.removeItem('jwtToken');
-      router.push("/login");
+      router.push("/");
     }
   };
 
